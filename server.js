@@ -1114,4 +1114,23 @@ if (require.main === module) {
   process.on('SIGINT', () => shutdown('SIGINT'));
 }
 
+// ═══════════════════════════════════════════════════════════════════════════════
+// FIREBASE CLOUD FUNCTIONS EXPORT
+// ═══════════════════════════════════════════════════════════════════════════════
+
+try {
+  const { onRequest } = require('firebase-functions/v2/https');
+  exports.api = onRequest({
+    cors: true,
+    timeoutSeconds: 120,
+    memory: '512MiB',
+    region: 'us-central1'
+  }, app);
+} catch (err) {
+  // Standalone environment fallback
+}
+
 module.exports = app;
+if (exports.api) {
+  module.exports.api = exports.api;
+}
