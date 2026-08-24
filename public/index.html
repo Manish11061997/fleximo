@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fleximo — Smart Remote Job Finder for Any Tech Stack</title>
+  <meta name="description" content="Upload your resume and find matching remote jobs instantly. Searches 9 major remote job boards across all technologies — React, Python, Java, DevOps, Data Science and more.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🚀%3C/text%3E%3C/svg%3E">
+</head>
+<body>
+  <!-- ═══ Background Effects ═══ -->
+  <div class="bg-effects">
+    <div class="bg-orb bg-orb-1"></div>
+    <div class="bg-orb bg-orb-2"></div>
+    <div class="bg-orb bg-orb-3"></div>
+    <div class="bg-grid"></div>
+  </div>
+
+  <!-- ═══ Header ═══ -->
+  <header class="header" id="header">
+    <div class="container">
+      <div class="header-inner">
+        <div class="logo">
+          <div class="logo-icon">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+              <rect width="32" height="32" rx="8" fill="url(#logo-grad)"/>
+              <path d="M10 16L14 20L22 12" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <defs>
+                <linearGradient id="logo-grad" x1="0" y1="0" x2="32" y2="32">
+                  <stop stop-color="#6366f1"/>
+                  <stop offset="1" stop-color="#a855f7"/>
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+          <div class="logo-text">
+            <h1>Fleximo</h1>
+            <span class="logo-badge">Remote Jobs</span>
+          </div>
+        </div>
+        <div class="header-right" style="display:flex; align-items:center; gap:10px;">
+          <div class="header-stats" id="header-stats" style="display:none;">
+            <div class="header-stat">
+              <span class="header-stat-value" id="stat-total">0</span>
+              <span class="header-stat-label">Jobs Found</span>
+            </div>
+            <div class="header-stat">
+              <span class="header-stat-value" id="stat-sources">9</span>
+              <span class="header-stat-label">Sources</span>
+            </div>
+          </div>
+          <button type="button" class="btn btn-ghost btn-sm header-alert-btn" id="open-alert-modal-btn" title="Automated Job Alerts & Email Digest">
+            <span class="material-symbols-rounded" style="font-size:18px; color:var(--md-sys-color-primary);">forward_to_inbox</span>
+            <span class="header-alert-text">Alerts</span>
+            <span class="header-alert-pill" id="header-alert-pill">Active</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="main" id="main">
+    <div class="container">
+
+      <!-- ═══ Upload Section ═══ -->
+      <section class="section upload-section" id="upload-section">
+        <!-- Collapsed state (shown after results load) -->
+        <div id="upload-collapsed" style="display:none; text-align:center; padding: 16px; background: var(--glass-bg); border:1px dashed var(--glass-border); border-radius: var(--radius-lg); cursor:pointer;" onclick="document.getElementById('upload-expanded').style.display='block'; document.getElementById('upload-collapsed').style.display='none';">
+          <p style="margin:0; font-size:0.95rem; color:var(--text-secondary); display:flex; align-items:center; justify-content:center; gap:10px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <strong style="color:var(--text-primary);">Upload YOUR Resume</strong>
+            <span>to get personalized job matches based on your actual skills &amp; experience</span>
+            <span class="btn btn-primary" style="padding:6px 16px; font-size:0.8rem; border-radius:8px; display:inline-flex; pointer-events:none;">Upload Now</span>
+          </p>
+        </div>
+
+        <!-- Expanded state -->
+        <div id="upload-expanded">
+          <div class="section-header">
+            <h2 class="section-title">Upload Your Resume</h2>
+            <p class="section-subtitle">Drop your resume and Fleximo will match you with the best remote opportunities across 9 major platforms worldwide</p>
+          </div>
+
+          <div class="upload-area" id="upload-area">
+            <div class="upload-area-inner">
+              <div class="upload-icon">
+                <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+                  <rect x="12" y="8" width="40" height="48" rx="4" stroke="currentColor" stroke-width="2" fill="none"/>
+                  <path d="M22 28L32 18L42 28" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <line x1="32" y1="18" x2="32" y2="42" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  <line x1="20" y1="48" x2="44" y2="48" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <div class="upload-text">
+                <p class="upload-text-main">Drop your resume here</p>
+                <p class="upload-text-sub">or <span class="upload-browse">click to browse</span></p>
+              </div>
+              <div class="upload-formats">
+                <span class="format-badge">PDF</span>
+                <span class="format-badge">DOCX</span>
+                <span class="format-badge">TXT</span>
+              </div>
+              <input type="file" id="file-input" accept=".pdf,.docx,.txt,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain" hidden>
+            </div>
+          </div>
+
+          <!-- Direct Keyword Search Box -->
+          <div class="direct-keyword-search" style="margin-top: 24px;">
+            <form id="direct-search-form" style="display: flex; gap: 10px; max-width: 700px; margin: 0 auto; align-items: center; background: var(--glass-bg); padding: 8px 12px; border-radius: var(--radius-lg); border: 1px solid var(--glass-border);">
+              <span style="font-size: 1.2rem; margin-left: 8px;">🔍</span>
+              <input type="text" id="direct-keyword-input" class="filter-input" style="flex: 1; border: none; background: transparent; padding: 10px 8px; font-size: 1rem; color: var(--text-primary);" placeholder="Search by keywords, job title, or tech stack (e.g. React, Python, Java, AWS, Flutter)..." required>
+              <button type="submit" class="btn btn-primary" id="direct-keyword-btn" style="padding: 10px 24px;">Search Jobs</button>
+            </form>
+          </div>
+
+          <!-- Upload progress -->
+          <div class="upload-progress" id="upload-progress" style="display:none;">
+            <div class="progress-card">
+              <div class="progress-icon">
+                <div class="spinner"></div>
+              </div>
+              <div class="progress-info">
+                <p class="progress-filename" id="progress-filename">resume.pdf</p>
+                <p class="progress-status" id="progress-status">Parsing resume...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ Resume Summary Section ═══ -->
+      <!-- ═══ Resume Summary Section (Visible ONLY on Resume Upload) ═══ -->
+      <section class="section resume-section" id="resume-section" style="display:none;">
+
+        <!-- Header: title + change button -->
+        <div class="resume-section-header">
+          <div class="resume-section-title">
+            <span>📄</span>
+            <span>Resume Analysis</span>
+          </div>
+          <button class="btn btn-ghost btn-sm" id="change-resume-btn">
+            ↩ Change Resume
+          </button>
+        </div>
+
+        <!-- Compact stat row: horizontal scrollable chips on mobile -->
+        <div class="resume-stat-row">
+          <div class="resume-stat-chip">
+            <span class="resume-stat-chip-icon">📎</span>
+            <div>
+              <div class="resume-stat-chip-label">File</div>
+              <div class="resume-stat-chip-value" id="resume-filename">—</div>
+            </div>
+          </div>
+          <div class="resume-stat-chip">
+            <span class="resume-stat-chip-icon">📊</span>
+            <div>
+              <div class="resume-stat-chip-label">Level</div>
+              <div class="resume-stat-chip-value" id="resume-experience">—</div>
+            </div>
+          </div>
+          <div class="resume-stat-chip">
+            <span class="resume-stat-chip-icon">⚡</span>
+            <div>
+              <div class="resume-stat-chip-label">Skills</div>
+              <div class="resume-stat-chip-value" id="resume-skills-count">0</div>
+            </div>
+          </div>
+          <div class="resume-stat-chip">
+            <span class="resume-stat-chip-icon">💼</span>
+            <div>
+              <div class="resume-stat-chip-label">Titles</div>
+              <div class="resume-stat-chip-value" id="resume-titles-count">0</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Applicant Profile: collapsible -->
+        <details class="profile-collapse" id="candidate-profile-banner">
+          <summary class="profile-collapse-summary">
+            <span class="profile-collapse-left">
+              <span>👤</span>
+              <span>Applicant Profile <em class="candidate-extracted-badge">✓ Auto-Extracted</em></span>
+            </span>
+            <span class="profile-collapse-arrow">▾</span>
+          </summary>
+          <div class="profile-collapse-body">
+            <div class="candidate-profile-grid">
+              <div class="profile-field-box">
+                <span class="profile-field-label">Full Name</span>
+                <strong id="card-candidate-name" class="profile-field-value">—</strong>
+              </div>
+              <div class="profile-field-box">
+                <span class="profile-field-label">Email</span>
+                <strong id="card-candidate-email" class="profile-field-value" style="color:#38bdf8;">—</strong>
+              </div>
+              <div class="profile-field-box">
+                <span class="profile-field-label">Phone</span>
+                <strong id="card-candidate-phone" class="profile-field-value">—</strong>
+              </div>
+              <div class="profile-field-box">
+                <span class="profile-field-label">LinkedIn</span>
+                <span id="card-candidate-linkedin" class="profile-field-value" style="color:var(--md-sys-color-primary);">—</span>
+              </div>
+            </div>
+            <div style="margin-top:10px; text-align:right;">
+              <button type="button" class="btn btn-ghost btn-sm" id="edit-candidate-profile-btn">✏️ Edit Profile</button>
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <!-- ═══ Results Section ═══ -->
+      <section class="section results-section" id="results-section" style="display:none;">
+
+        <!-- Pinned Top Controls Bar (Fixed above jobs) -->
+        <div class="results-controls-pinned" id="results-controls-pinned">
+          <!-- Top Persistent Keyword Search & Switch Mode Bar -->
+          <div class="results-search-bar" id="results-search-bar">
+            <form id="top-search-form" class="top-search-form">
+              <div class="top-search-input-box">
+                <span class="material-symbols-rounded top-search-icon">search</span>
+                <input type="text" id="top-search-input" class="top-search-input" placeholder="Search other keywords (e.g. React, Python, AWS)..." required>
+                <button type="button" class="top-search-clear-btn" id="top-search-clear-btn" style="display:none;" title="Clear search">&times;</button>
+              </div>
+              <button type="submit" class="btn btn-primary btn-sm top-search-btn" id="top-search-submit-btn">
+                <span>Search</span>
+              </button>
+              <button type="button" class="btn btn-ghost btn-sm top-switch-resume-btn" id="top-switch-resume-btn" title="Upload a resume for personalized matching">
+                <span>📄 Upload Resume</span>
+              </button>
+            </form>
+          </div>
+
+          <!-- Tabs -->
+          <div class="tabs" id="tabs">
+            <button class="tab active" id="tab-worldwide" data-tab="worldwide">
+              <span class="tab-emoji">🌐</span>
+              <span class="tab-text">Worldwide</span>
+              <span class="tab-count" id="tab-worldwide-count">0</span>
+            </button>
+            <button class="tab" id="tab-india" data-tab="india">
+              <span class="tab-emoji">🇮🇳</span>
+              <span class="tab-text">India</span>
+              <span class="tab-count" id="tab-india-count">0</span>
+            </button>
+            <button class="tab" id="tab-global" data-tab="global">
+              <span class="tab-emoji">🌍</span>
+              <span class="tab-text">All Remote</span>
+              <span class="tab-count" id="tab-global-count">0</span>
+            </button>
+            <button class="tab" id="tab-applied" data-tab="applied">
+              <span class="tab-emoji">📋</span>
+              <span class="tab-text">Applied</span>
+              <span class="tab-count" id="tab-applied-count" style="background:var(--accent-primary);">0</span>
+            </button>
+            <div class="tab-indicator" id="tab-indicator"></div>
+          </div>
+
+          <!-- Filter Bar (Adaptive: Inline Toolbar on Desktop, Modal on Mobile) -->
+          <div class="quick-filter-bar">
+            <div class="quick-search-wrapper">
+              <span class="material-symbols-rounded" style="font-size: 17px; color: var(--md-sys-color-outline);">search</span>
+              <input type="text" class="quick-search-input" id="search-input" placeholder="Search title, company, skill...">
+            </div>
+
+            <!-- Desktop Inline Filter Dropdowns (Visible on > 768px) -->
+            <div class="desktop-filter-group" id="desktop-filter-group">
+              <select class="filter-select" id="sort-select" title="Sort by">
+                <option value="match">Best Match</option>
+                <option value="date">Newest First</option>
+                <option value="company">Company A-Z</option>
+              </select>
+              <select class="filter-select" id="min-match" title="Minimum match percentage">
+                <option value="0" selected>All Matches</option>
+                <option value="25">25%+</option>
+                <option value="50">50%+</option>
+                <option value="75">75%+</option>
+              </select>
+              <select class="filter-select" id="remote-type-filter" title="Workplace type">
+                <option value="all">All Remote Types</option>
+                <option value="worldwide">🌐 100% Worldwide</option>
+                <option value="country_restricted">📍 Country-Restricted</option>
+              </select>
+              <select class="filter-select" id="country-scope-filter" title="Country / Region">
+                <option value="all">All Regions</option>
+                <option value="worldwide">🌐 Worldwide</option>
+                <option value="india">🇮🇳 India</option>
+                <option value="us">🇺🇸 US / Americas</option>
+                <option value="europe">🇪🇺 Europe &amp; UK</option>
+                <option value="apac">🇦🇺 APAC</option>
+                <option value="latam">🌎 LATAM</option>
+              </select>
+              <select class="filter-select" id="date-range-select" title="Date range">
+                <option value="30">Last 30 Days</option>
+                <option value="10">Last 10 Days</option>
+                <option value="7">Last 7 Days</option>
+                <option value="3">Last 3 Days</option>
+                <option value="1">Last 24 Hours</option>
+                <option value="0">All Time</option>
+              </select>
+            </div>
+
+            <!-- Mobile Modal Trigger (Visible on <= 768px) -->
+            <button type="button" class="btn btn-secondary btn-sm filter-modal-trigger" id="open-filters-modal-btn">
+              <span class="material-symbols-rounded" style="font-size: 16px;">tune</span>
+              <span>Filters</span>
+              <span class="active-filter-badge" id="active-filter-badge" style="display:none;">0</span>
+            </button>
+
+            <button type="button" class="btn btn-ghost btn-sm" id="reset-filters-btn" title="Reset all filters" style="display:none; padding: 4px 8px; height: 32px;">
+              <span class="material-symbols-rounded" style="font-size: 16px;">restart_alt</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Filters Modal Overlay (For Mobile) -->
+        <div class="modal-overlay" id="filters-modal-overlay" style="display:none; z-index: 1200;">
+          <div class="modal" id="filters-modal" style="max-width: 500px; padding: 24px;">
+            <div class="modal-header" style="margin-bottom: 20px;">
+              <h3 class="modal-title">Job Filters</h3>
+              <button class="modal-close" id="close-filters-modal-btn">&times;</button>
+            </div>
+            <div class="modal-body" style="display: flex; flex-direction: column; gap: 16px;">
+              <div class="filter-group">
+                <label class="filter-label" for="modal-sort-select">Sort by</label>
+                <select class="filter-select" id="modal-sort-select">
+                  <option value="match">Best Match</option>
+                  <option value="date">Newest First</option>
+                  <option value="company">Company A-Z</option>
+                </select>
+              </div>
+              <div class="filter-group">
+                <label class="filter-label" for="modal-min-match">Min Match</label>
+                <select class="filter-select" id="modal-min-match">
+                  <option value="0" selected>All Matches</option>
+                  <option value="25">25%+</option>
+                  <option value="50">50%+</option>
+                  <option value="75">75%+</option>
+                </select>
+              </div>
+              <div class="filter-group">
+                <label class="filter-label" for="modal-remote-type-filter">Workplace Type</label>
+                <select class="filter-select" id="modal-remote-type-filter">
+                  <option value="all">All Remote Types</option>
+                  <option value="worldwide">🌐 100% Work from Anywhere</option>
+                  <option value="country_restricted">📍 Country-Restricted Remote</option>
+                </select>
+              </div>
+              <div class="filter-group">
+                <label class="filter-label" for="modal-country-scope-filter">Country / Region</label>
+                <select class="filter-select" id="modal-country-scope-filter">
+                  <option value="all">All Countries &amp; Regions</option>
+                  <option value="worldwide">🌐 Worldwide / Borderless</option>
+                  <option value="india">🇮🇳 India</option>
+                  <option value="us">🇺🇸 United States &amp; Americas</option>
+                  <option value="europe">🇪🇺 Europe &amp; UK</option>
+                  <option value="apac">🇦🇺 Australia &amp; APAC</option>
+                  <option value="latam">🌎 Latin America (LATAM)</option>
+                </select>
+              </div>
+              <div class="filter-group">
+                <label class="filter-label" for="modal-date-range-select">Date Range</label>
+                <select class="filter-select" id="modal-date-range-select">
+                  <option value="30">Last 30 Days (Recommended)</option>
+                  <option value="10">Last 10 Days</option>
+                  <option value="7">Last 7 Days</option>
+                  <option value="3">Last 3 Days</option>
+                  <option value="1">Last 24 Hours</option>
+                  <option value="0">All Time</option>
+                </select>
+              </div>
+            </div>
+            <div class="modal-footer" style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center;">
+              <button type="button" class="btn btn-ghost btn-sm" id="modal-reset-filters-btn">
+                <span class="material-symbols-rounded" style="font-size:16px;">restart_alt</span>
+                Reset Defaults
+              </button>
+              <div style="display:flex; gap:8px;">
+                <button type="button" class="btn btn-ghost btn-sm" id="cancel-filters-modal-btn">Cancel</button>
+                <button type="button" class="btn btn-primary btn-sm" id="apply-filters-btn" style="padding: 8px 20px;">
+                  Apply Filters
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dedicated Scrollable Jobs Container (100% of Viewport Below Fixed Header) -->
+        <div class="jobs-scroll-container" id="jobs-scroll-container">
+          <!-- Job lists -->
+          <div class="job-list" id="job-list-worldwide"></div>
+          <div class="job-list" id="job-list-india" style="display:none;"></div>
+          <div class="job-list" id="job-list-global" style="display:none;"></div>
+          <div class="job-list" id="job-list-applied" style="display:none;"></div>
+
+          <!-- Empty state -->
+          <div class="empty-state" id="empty-state" style="display:none;">
+            <span class="empty-icon">🔎</span>
+            <h3 class="empty-title">No matching jobs found</h3>
+            <p class="empty-subtitle">Try adjusting your filters or upload a different resume</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ Error Section ═══ -->
+      <section class="section error-section" id="error-section" style="display:none;">
+        <div class="error-card">
+          <span class="error-icon">⚠️</span>
+          <h3 class="error-title" id="error-title">Something went wrong</h3>
+          <p class="error-message" id="error-message"></p>
+          <button class="btn btn-primary" id="error-retry-btn">Try Again</button>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- ═══ Footer ═══ -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <p class="footer-text">
+          Powered by
+          <a href="https://remotive.com" target="_blank" rel="noopener">Remotive</a> •
+          <a href="https://remoteok.com" target="_blank" rel="noopener">RemoteOK</a> •
+          <a href="https://himalayas.app" target="_blank" rel="noopener">Himalayas</a> •
+          <a href="https://www.arbeitnow.com" target="_blank" rel="noopener">Arbeitnow</a> •
+          <a href="https://jobicy.com" target="_blank" rel="noopener">Jobicy</a> •
+          <a href="https://weworkremotely.com" target="_blank" rel="noopener">We Work Remotely</a> •
+          <a href="https://jobspresso.co" target="_blank" rel="noopener">Jobspresso</a>
+        </p>
+        <p class="footer-note">Fleximo — Jobs updated in real-time across 9 major remote job platforms</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ═══ Searching Loading Modal ═══ -->
+  <div class="modal-overlay" id="searching-modal-overlay" style="display:none; z-index: 1100;">
+    <div class="modal searching-modal" style="max-width: 440px; text-align: center; padding: 24px 20px;">
+      <div class="searching-animation" style="margin: 0 auto 12px auto;">
+        <div class="search-ring"></div>
+        <div class="search-ring search-ring-2"></div>
+        <div class="search-ring search-ring-3"></div>
+        <span class="search-emoji">🔍</span>
+      </div>
+      <h3 class="searching-title" id="searching-title" style="font-size: 1.1rem; margin-bottom: 4px;">Searching Remote Jobs...</h3>
+      <p class="searching-subtitle" id="searching-status" style="font-size: 0.8rem; color: var(--md-sys-color-on-surface-variant); margin-bottom: 14px;">Querying 9 major remote platforms in parallel</p>
+      <div class="search-sources" style="gap: 4px; justify-content: center;">
+        <span class="source-chip" id="src-remotive">Remotive</span>
+        <span class="source-chip" id="src-remoteok">RemoteOK</span>
+        <span class="source-chip" id="src-himalayas">Himalayas</span>
+        <span class="source-chip" id="src-arbeitnow">Arbeitnow</span>
+        <span class="source-chip" id="src-jobicy">Jobicy</span>
+        <span class="source-chip" id="src-wwr">We Work Remotely</span>
+        <span class="source-chip" id="src-jobspresso">Jobspresso</span>
+        <span class="source-chip" id="src-workingnomads">Working Nomads</span>
+        <span class="source-chip" id="src-nodesk">NoDesk</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ Job Detail Modal ═══ -->
+  <div class="modal-overlay" id="modal-overlay" style="display:none;">
+    <div class="modal" id="job-modal">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-title"></h3>
+        <button class="modal-close" id="modal-close">&times;</button>
+      </div>
+      <div class="modal-body" id="modal-body"></div>
+      <div class="modal-footer" style="display:flex; justify-content:space-between; align-items:center;">
+        <a class="btn btn-ghost" id="modal-apply-link" href="#" target="_blank" rel="noopener">
+          View Original Posting ↗
+        </a>
+        <button class="btn btn-primary" id="modal-auto-apply-btn" style="padding:12px 24px;">
+          🤖 Auto-Apply on My Behalf
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ Auto-Apply Modal ═══ -->
+  <div class="modal-overlay" id="auto-apply-modal-overlay" style="display:none;">
+    <div class="modal" id="auto-apply-modal" style="max-width: 650px;">
+      <div class="modal-header" style="border-bottom:1px solid var(--glass-border);">
+        <h3 class="modal-title" style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:1.3rem;">🤖</span>
+          Auto-Apply Assistant
+        </h3>
+        <button class="modal-close" id="auto-apply-modal-close">&times;</button>
+      </div>
+
+      <div class="modal-body" style="padding: 20px;">
+        <div id="apply-target-job-info" style="background:var(--glass-bg); padding:12px 16px; border-radius:var(--radius-md); border:1px solid var(--glass-border); margin-bottom:20px;">
+          <div style="font-weight:700; font-size:1.05rem;" id="apply-target-title">Position</div>
+          <div style="color:var(--text-secondary); font-size:0.9rem;" id="apply-target-company">Company</div>
+        </div>
+
+        <form id="auto-apply-form">
+          <h4 style="margin-bottom:12px; font-size:0.95rem; color:var(--text-accent);">1. Candidate Profile &amp; Contact Details</h4>
+          <div class="modal-grid-2">
+            <div>
+              <label class="filter-label">Full Name *</label>
+              <input type="text" id="applicant-name" class="filter-input" style="width:100%;" required placeholder="Your Full Name">
+            </div>
+            <div>
+              <label class="filter-label">Your Email Address *</label>
+              <input type="email" id="applicant-email" class="filter-input" style="width:100%;" required placeholder="yourname@example.com">
+            </div>
+            <div>
+              <label class="filter-label">Phone / WhatsApp</label>
+              <input type="text" id="applicant-phone" class="filter-input" style="width:100%;" placeholder="+1 (555) 000-0000">
+            </div>
+            <div>
+              <label class="filter-label">LinkedIn / Portfolio URL</label>
+              <input type="url" id="applicant-linkedin" class="filter-input" style="width:100%;" placeholder="https://linkedin.com/in/username">
+            </div>
+          </div>
+
+          <h4 style="margin-bottom:12px; font-size:0.95rem; color:var(--text-accent);">2. Employer HR Recipient Email</h4>
+          <div style="margin-bottom:16px;">
+            <input type="email" id="recipient-hr-email" class="filter-input" style="width:100%;" placeholder="careers@company.com" required>
+            <div style="font-size:0.8rem; color:var(--text-muted); margin-top:4px;">Target company HR email (auto-detected or editable).</div>
+          </div>
+
+          <div style="background:rgba(99,102,241,0.08); border:1px solid rgba(99,102,241,0.2); padding:10px 14px; border-radius:var(--radius-md); margin-bottom:16px; display:flex; align-items:center; gap:10px;">
+            <input type="checkbox" id="send-candidate-copy-check" checked style="accent-color:var(--accent-primary); width:18px; height:18px; cursor:pointer; flex-shrink:0;">
+            <label for="send-candidate-copy-check" style="font-size:0.85rem; color:var(--text-primary); cursor:pointer; font-weight:600; margin:0; line-height:1.4;">
+              📬 Send confirmation copy &amp; application receipt to my email (<span id="copy-email-preview" style="color:#38bdf8; word-break:break-all;">your-email@example.com</span>)
+            </label>
+          </div>
+
+          <div style="background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.2); padding:10px 14px; border-radius:var(--radius-md); margin-bottom:16px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px;">
+            <span style="font-size:0.85rem; color:#10b981; font-weight:600;" id="resume-attachment-badge">📎 Resume Attached: Yes</span>
+            <span style="font-size:0.75rem; color:var(--text-muted); word-break:break-all;" id="resume-attachment-name">resume.pdf</span>
+          </div>
+
+          <h4 style="margin-bottom:10px; font-size:0.95rem; color:var(--text-accent); display:flex; justify-content:space-between; align-items:center;">
+            <span>3. Tailored Cover Letter (Email Body)</span>
+            <button type="button" class="btn btn-ghost" id="regenerate-cover-letter-btn" style="padding:4px 10px; font-size:0.8rem;">
+              ✨ Regenerate
+            </button>
+          </h4>
+          <textarea id="applicant-cover-letter" class="filter-input" style="width:100%; height:160px; font-family:monospace; font-size:0.85rem; line-height:1.5; padding:12px; margin-bottom:20px; resize:vertical; box-sizing:border-box;"></textarea>
+
+          <!-- Optional SMTP Settings Toggle -->
+          <details style="margin-bottom:20px; background:var(--glass-bg); border:1px solid var(--glass-border); border-radius:var(--radius-md); padding:12px 14px;">
+            <summary style="font-size:0.85rem; font-weight:600; color:var(--text-accent); cursor:pointer;">
+              ⚙️ Email Delivery Settings (Gmail SMTP or Instant Sandbox)
+            </summary>
+            <div style="margin-top:10px; font-size:0.8rem; color:var(--text-secondary); line-height:1.5;">
+              <strong>Sandbox Mode (Default):</strong> Generates real MIME applications with web preview links.<br>
+              <strong>Direct Gmail Mode:</strong> Send directly from your email to the company's real inbox using a Gmail App Password (<a href="https://myaccount.google.com/apppasswords" target="_blank" rel="noopener" style="color:#38bdf8;">Generate App Password</a>).
+            </div>
+            <div class="modal-grid-2" style="margin-top:12px;">
+              <div>
+                <label class="filter-label">SMTP Host</label>
+                <input type="text" id="smtp-host" class="filter-input" style="width:100%; font-size:0.85rem;" placeholder="smtp.gmail.com" value="smtp.gmail.com">
+              </div>
+              <div>
+                <label class="filter-label">Sender Gmail / Email</label>
+                <input type="email" id="smtp-user" class="filter-input" style="width:100%; font-size:0.85rem;" placeholder="yourname@gmail.com">
+              </div>
+              <div style="grid-column: 1 / -1;">
+                <label class="filter-label">16-Character Gmail App Password</label>
+                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                  <input type="password" id="smtp-pass" class="filter-input" style="flex:1; min-width:180px; font-size:0.85rem;" placeholder="abcd efgh ijkl mnop">
+                  <button type="button" class="btn btn-secondary" id="test-smtp-btn" style="white-space:nowrap; padding:8px 14px; font-size:0.8rem;">
+                    ⚡ Test Connection
+                  </button>
+                </div>
+                <div id="smtp-test-status" style="font-size:0.8rem; margin-top:6px; display:none;"></div>
+              </div>
+            </div>
+          </details>
+
+          <!-- Submission Progress Container -->
+          <div id="apply-progress-card" style="display:none; background:rgba(99,102,241,0.08); padding:16px; border-radius:var(--radius-md); border:1px solid rgba(99,102,241,0.2); margin-bottom:16px; text-align:center;">
+            <div class="spinner" style="margin: 0 auto 10px auto;"></div>
+            <div style="font-weight:600; color:var(--text-primary);" id="apply-progress-status">Packaging resume and cover letter...</div>
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" class="btn btn-ghost" id="auto-apply-cancel">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="auto-apply-submit-btn" style="padding:12px 24px;">
+              🚀 Send Application
+            </button>
+          </div>
+        </form>
+
+        <!-- Application Success View -->
+        <div id="apply-success-card" style="display:none; text-align:center; padding:20px 12px;">
+          <div style="font-size:3rem; margin-bottom:12px;">🚀</div>
+          <h3 style="font-size:1.3rem; font-weight:700; color:var(--text-primary); margin-bottom:6px;">Application Successfully Dispatched!</h3>
+          <p style="color:var(--text-secondary); margin-bottom:16px; font-size:0.9rem;" id="apply-success-msg">Your resume and tailored cover letter were emailed directly on your behalf.</p>
+          <div style="background:var(--glass-bg); padding:8px 14px; border-radius:var(--radius-md); font-family:monospace; font-size:0.85rem; display:inline-block; margin-bottom:18px; color:var(--text-accent); border:1px solid var(--glass-border);" id="apply-success-code">
+            Ref: APP-XXXXXXXX
+          </div>
+
+          <!-- Dual Delivery Cards -->
+          <div class="modal-grid-2" style="text-align:left; margin-bottom:20px;">
+            <div style="background:rgba(16,185,129,0.06); border:1px solid rgba(16,185,129,0.25); border-radius:var(--radius-md); padding:12px;">
+              <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
+                <strong style="color:#10b981; font-size:0.85rem;">🏢 Company HR</strong>
+                <span style="font-size:0.7rem; background:rgba(16,185,129,0.2); color:#34d399; padding:2px 6px; border-radius:4px; font-weight:bold;">Sent 🟢</span>
+              </div>
+              <p style="font-size:0.8rem; color:var(--text-secondary); margin:0 0 8px 0; word-break:break-all;" id="company-delivery-email">careers@company.com</p>
+              <div id="company-preview-container" style="display:none;">
+                <a id="company-preview-link" href="#" target="_blank" rel="noopener" class="btn btn-ghost" style="padding:4px 8px; font-size:0.75rem; width:100%; justify-content:center; color:#38bdf8; border-color:rgba(56,189,248,0.3);">
+                  🔗 View Sent Email ↗
+                </a>
+              </div>
+            </div>
+
+            <div style="background:rgba(99,102,241,0.06); border:1px solid rgba(99,102,241,0.25); border-radius:var(--radius-md); padding:12px;">
+              <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
+                <strong style="color:#818cf8; font-size:0.85rem;">📬 Your Confirmation</strong>
+                <span style="font-size:0.7rem; background:rgba(99,102,241,0.2); color:#a5b4fc; padding:2px 6px; border-radius:4px; font-weight:bold;" id="candidate-delivery-badge">Delivered 🟢</span>
+              </div>
+              <p style="font-size:0.8rem; color:var(--text-secondary); margin:0 0 8px 0; word-break:break-all;" id="candidate-delivery-email">you@example.com</p>
+              <div id="candidate-preview-container" style="display:none;">
+                <a id="candidate-preview-link" href="#" target="_blank" rel="noopener" class="btn btn-ghost" style="padding:4px 8px; font-size:0.75rem; width:100%; justify-content:center; color:#818cf8; border-color:rgba(129,140,248,0.3);">
+                  🔗 View Receipt Copy ↗
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex; justify-content:center; gap:10px; flex-wrap:wrap;">
+            <button type="button" class="btn btn-secondary btn-sm" id="view-sent-cover-letter-btn" style="padding:8px 16px;">
+              📝 View Sent Letter
+            </button>
+            <button type="button" class="btn btn-primary btn-sm" id="apply-done-btn" style="padding:8px 18px;">
+              📋 View in Tracker
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ Automated Job Alert & Email Notifier Modal ═══ -->
+  <div class="modal-overlay" id="alert-modal-overlay" style="display:none; z-index: 1250;">
+    <div class="modal" id="alert-modal" style="max-width: 620px; padding: 24px;">
+      <div class="modal-header" style="margin-bottom: 18px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div class="alert-card-logo" style="width:38px; height:38px;">
+            <span class="material-symbols-rounded" style="font-size:20px;">forward_to_inbox</span>
+          </div>
+          <div>
+            <h3 class="modal-title" style="margin:0; font-size:1.1rem;">Automated Job Alerts &amp; Email Digest</h3>
+            <p style="margin:2px 0 0 0; font-size:0.75rem; color:var(--md-sys-color-on-surface-variant);">Background scanner for newly posted remote jobs across 9 platforms.</p>
+          </div>
+        </div>
+        <button class="modal-close" id="close-alert-modal-btn">&times;</button>
+      </div>
+
+      <div class="modal-body" style="display:flex; flex-direction:column; gap:16px;">
+        <div class="alert-status-row" style="margin-bottom: 0;">
+          <div class="alert-status-info">
+            <span class="alert-status-label">Alert Schedule Status:</span>
+            <span class="alert-status-subtext">Toggle background auto-scanning</span>
+          </div>
+          <div class="alert-status-control">
+            <select id="alert-toggle" class="filter-select" style="padding:6px 12px; font-weight:bold; width:auto;">
+              <option value="false">⚪ Disabled</option>
+              <option value="true" selected>🟢 Active</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Alert Settings Grid -->
+        <div class="alert-grid" style="margin-bottom: 0;">
+          <div>
+            <label style="font-size:0.78rem; color:var(--md-sys-color-on-surface-variant); font-weight:600; display:block; margin-bottom:4px;" for="alert-email-input">Delivery Email Address</label>
+            <input type="email" id="alert-email-input" class="filter-input" placeholder="you@example.com" style="width:100%; padding:9px 12px;">
+          </div>
+          <div>
+            <label style="font-size:0.78rem; color:var(--md-sys-color-on-surface-variant); font-weight:600; display:block; margin-bottom:4px;" for="alert-interval-select">Check Frequency</label>
+            <select id="alert-interval-select" class="filter-select" style="width:100%; padding:9px 12px;">
+              <option value="4">Every 4 Hours</option>
+              <option value="8" selected>Every 8 Hours (Recommended)</option>
+              <option value="12">Every 12 Hours</option>
+              <option value="24">Every 24 Hours (Daily Digest)</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:0.78rem; color:var(--md-sys-color-on-surface-variant); font-weight:600; display:block; margin-bottom:4px;" for="alert-region-select">Target Region Filter</label>
+            <select id="alert-region-select" class="filter-select" style="width:100%; padding:9px 12px;">
+              <option value="all" selected>All Matching Remote Roles</option>
+              <option value="worldwide">🌐 100% Worldwide Remote Only</option>
+              <option value="india">🇮🇳 India Remote Only</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:0.78rem; color:var(--md-sys-color-on-surface-variant); font-weight:600; display:block; margin-bottom:4px;" for="alert-min-match-select">Minimum Match Score</label>
+            <select id="alert-min-match-select" class="filter-select" style="width:100%; padding:9px 12px;">
+              <option value="0" selected>All Matches (0%+)</option>
+              <option value="25">25%+ Match</option>
+              <option value="50">50%+ Match</option>
+              <option value="75">75%+ Strong Match</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="alert-actions" style="margin-bottom:0;">
+          <button id="save-alert-btn" class="btn btn-secondary" style="padding:9px 16px; display:inline-flex; align-items:center; gap:6px;">
+            <span class="material-symbols-rounded" style="font-size:17px;">save</span> Save Settings
+          </button>
+          <button id="test-alert-email-btn" class="btn btn-secondary" style="padding:9px 16px; display:inline-flex; align-items:center; gap:6px;">
+            <span class="material-symbols-rounded" style="font-size:17px;">mark_email_read</span> Send Test Email
+          </button>
+          <button id="trigger-alert-btn" class="btn btn-primary" style="padding:9px 16px; display:inline-flex; align-items:center; gap:6px;">
+            <span class="material-symbols-rounded" style="font-size:17px;">bolt</span> Run Check Now
+          </button>
+        </div>
+
+        <details style="background:rgba(255,255,255,0.03); border:1px solid var(--md-sys-color-outline-variant); border-radius:8px; padding:10px 14px;">
+          <summary style="font-size:0.82rem; font-weight:600; color:var(--md-sys-color-primary); cursor:pointer;">
+            🔑 Optional: Connect Gmail App Password for Direct Delivery
+          </summary>
+          <div style="margin-top:8px; font-size:0.78rem; color:var(--md-sys-color-on-surface-variant); line-height:1.5;">
+            Generate a 16-character App Password at <a href="https://myaccount.google.com/apppasswords" target="_blank" style="color:var(--md-sys-color-primary);">myaccount.google.com/apppasswords</a>.
+          </div>
+          <div class="alert-smtp-grid" style="margin-top:8px;">
+            <div>
+              <label style="font-size:0.75rem; color:var(--md-sys-color-on-surface-variant); font-weight:600; display:block; margin-bottom:4px;">Gmail Address</label>
+              <input type="email" id="alert-smtp-user" class="filter-input" placeholder="yourname@gmail.com" style="width:100%; padding:7px; font-size:0.82rem;">
+            </div>
+            <div>
+              <label style="font-size:0.75rem; color:var(--md-sys-color-on-surface-variant); font-weight:600; display:block; margin-bottom:4px;">16-Char App Password</label>
+              <input type="password" id="alert-smtp-pass" class="filter-input" placeholder="xxxx xxxx xxxx xxxx" style="width:100%; padding:7px; font-size:0.82rem;">
+            </div>
+          </div>
+        </details>
+
+        <div id="alert-status-msg" style="font-size:0.82rem; color:#10b981; display:none; padding:8px 12px; background:rgba(16,185,129,0.08); border-radius:8px; border:1px solid rgba(16,185,129,0.2);"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ Quick Profile Edit Modal ═══ -->
+  <div class="modal-overlay" id="profile-edit-modal-overlay" style="display:none;">
+    <div class="modal" style="max-width: 500px;">
+      <div class="modal-header">
+        <h3 class="modal-title">✏️ Edit Candidate Profile</h3>
+        <button class="modal-close" id="profile-edit-modal-close">&times;</button>
+      </div>
+      <div class="modal-body" style="padding:20px;">
+        <form id="profile-edit-form">
+          <div style="margin-bottom:12px;">
+            <label class="filter-label">Full Name *</label>
+            <input type="text" id="quick-edit-name" class="filter-input" style="width:100%;" required>
+          </div>
+          <div style="margin-bottom:12px;">
+            <label class="filter-label">Email Address *</label>
+            <input type="email" id="quick-edit-email" class="filter-input" style="width:100%;" required>
+          </div>
+          <div style="margin-bottom:12px;">
+            <label class="filter-label">Phone / WhatsApp</label>
+            <input type="text" id="quick-edit-phone" class="filter-input" style="width:100%;" placeholder="+91 9876543210">
+          </div>
+          <div style="margin-bottom:16px;">
+            <label class="filter-label">LinkedIn / Portfolio URL</label>
+            <input type="url" id="quick-edit-linkedin" class="filter-input" style="width:100%;" placeholder="https://linkedin.com/in/username">
+          </div>
+          <div style="display:flex; justify-content:flex-end; gap:10px;">
+            <button type="button" class="btn btn-ghost" id="profile-edit-cancel">Cancel</button>
+            <button type="submit" class="btn btn-primary" style="padding:8px 20px;">Save Profile</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ View Sent Cover Letter Modal ═══ -->
+  <div class="modal-overlay" id="view-cover-letter-modal-overlay" style="display:none;">
+    <div class="modal" style="max-width: 600px;">
+      <div class="modal-header">
+        <h3 class="modal-title">✉️ Sent Cover Letter</h3>
+        <button class="modal-close" id="view-cover-letter-close">&times;</button>
+      </div>
+      <div class="modal-body" style="padding:20px;">
+        <pre id="view-cover-letter-body" style="background:rgba(0,0,0,0.3); padding:16px; border-radius:var(--radius-md); border:1px solid var(--glass-border); font-family:monospace; font-size:0.85rem; line-height:1.6; color:var(--text-secondary); white-space:pre-wrap; max-height:400px; overflow-y:auto;"></pre>
+        <div style="display:flex; justify-content:flex-end; margin-top:16px;">
+          <button type="button" class="btn btn-primary" id="view-cover-letter-done">Done</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

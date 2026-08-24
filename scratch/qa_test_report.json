@@ -1,0 +1,147 @@
+{
+  "total": 24,
+  "passed": 24,
+  "failed": 0,
+  "suites": [
+    {
+      "name": "Resume Parser Engine",
+      "tests": [
+        {
+          "description": "Resume parser extracts Salesforce skills (Salesforce, Apex, LWC)",
+          "status": "PASS",
+          "detail": "Found: Web components, REST, Rest api, Salesforce, Apex, Lwc, Lightning web components, Visualforce, Soql, Sales cloud, Service cloud, Experience cloud, Salesforce developer"
+        },
+        {
+          "description": "Experience level correctly parsed as Senior with 6 years",
+          "status": "PASS",
+          "detail": "Parsed: years=6, level=senior"
+        },
+        {
+          "description": "Title extraction identifies Salesforce Developer role",
+          "status": "PASS",
+          "detail": "Titles: Salesforce Developer, Senior Salesforce Developer"
+        },
+        {
+          "description": "Empty resume input yields 0 extracted skills cleanly without error",
+          "status": "PASS",
+          "detail": ""
+        }
+      ]
+    },
+    {
+      "name": "Job Search Engine & Relevance Filter",
+      "tests": [
+        {
+          "description": "100% Fully Remote job accepted by remote purity filter",
+          "status": "PASS",
+          "detail": ""
+        },
+        {
+          "description": "Hybrid job rejected by remote purity filter",
+          "status": "PASS",
+          "detail": ""
+        },
+        {
+          "description": "Onsite job rejected by remote purity filter",
+          "status": "PASS",
+          "detail": ""
+        },
+        {
+          "description": "Australia remote role correctly tagged as AU/NZ",
+          "status": "PASS",
+          "detail": ""
+        },
+        {
+          "description": "New Zealand remote role correctly tagged as AU/NZ",
+          "status": "PASS",
+          "detail": ""
+        },
+        {
+          "description": "US remote role correctly excluded from AU/NZ",
+          "status": "PASS",
+          "detail": ""
+        },
+        {
+          "description": "Valid Salesforce Developer job receives high match score (>=80)",
+          "status": "PASS",
+          "detail": "Score: 100"
+        },
+        {
+          "description": "Unrelated job mentioning Salesforce only in description body is STRICTLY REJECTED (score = 0)",
+          "status": "PASS",
+          "detail": "Score: 0"
+        }
+      ]
+    },
+    {
+      "name": "REST API Endpoints & Contracts",
+      "tests": [
+        {
+          "description": "GET /api/alerts/config returns HTTP 200 with success status",
+          "status": "PASS",
+          "detail": "Status: 200"
+        },
+        {
+          "description": "Alert config contains correct target email (rvk8297@gmail.com) and boolean enabled status",
+          "status": "PASS",
+          "detail": ""
+        },
+        {
+          "description": "POST /api/alerts/config updates settings and SMTP config successfully",
+          "status": "PASS",
+          "detail": ""
+        },
+        {
+          "description": "POST /api/alerts/reset-seen clears seen jobs history",
+          "status": "PASS",
+          "detail": ""
+        },
+        {
+          "description": "Seen jobs database verified to be 0 after reset",
+          "status": "PASS",
+          "detail": ""
+        },
+        {
+          "description": "POST /api/search-jobs validates inputs and rejects empty payload with HTTP 400",
+          "status": "PASS",
+          "detail": ""
+        },
+        {
+          "description": "POST /api/search-jobs executes live search across 7 platforms successfully",
+          "status": "PASS",
+          "detail": ""
+        },
+        {
+          "description": "Salesforce search returned 14 active matched jobs",
+          "status": "PASS",
+          "detail": "Count: 14"
+        },
+        {
+          "description": "100% of returned job titles strictly match Salesforce ecosystem (Zero false positives)",
+          "status": "PASS",
+          "detail": "Zero false positives"
+        }
+      ]
+    },
+    {
+      "name": "Performance, Latency & Edge Cases",
+      "tests": [
+        {
+          "description": "POST /api/alerts/trigger-check runs automated 8-hour alert check successfully",
+          "status": "PASS",
+          "detail": ""
+        },
+        {
+          "description": "Multi-platform job search & alert check completes in under 10 seconds (9542ms)",
+          "status": "PASS",
+          "detail": "Duration: 9542ms"
+        },
+        {
+          "description": "Alert check generates & sends Nodemailer email digest successfully",
+          "status": "PASS",
+          "detail": ""
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "enabled": true,
+  "userEmail": "",
+  "intervalHours": 8,
+  "lastRun": "2026-08-24T01:18:59.943Z",
+  "lastCheckNewCount": 22,
+  "lastRunStatus": "Checked successfully. 22 new jobs found.",
+  "smtpConfig": null
+}
