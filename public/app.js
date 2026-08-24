@@ -1339,6 +1339,10 @@
                 <span class="job-meta-pill ${isWorldwide ? 'pill-worldwide' : 'pill-regional'}">
                   ${isWorldwide ? '🌐 Worldwide' : (job.regionInfo?.badge || '📍 Remote')}
                 </span>
+                ${job.seniority && job.seniority !== 'All Experience Levels' ? `
+                  <span class="job-subline-dot">•</span>
+                  <span class="job-meta-pill pill-seniority" style="font-size:0.72rem; background:rgba(99,102,241,0.12); color:#818cf8; border:1px solid rgba(99,102,241,0.25);">🎓 ${escapeHtml(job.seniority)}</span>
+                ` : ''}
                 ${job.salary ? `
                   <span class="job-subline-dot">•</span>
                   <span class="job-meta-pill pill-salary">💰 ${escapeHtml(job.salary)}</span>
@@ -1378,14 +1382,14 @@
           </div>
 
           ${cleanDescription ? `
-            <p class="job-expanded-snippet">${escapeHtml(truncate(cleanDescription, 140))}</p>
+            <p class="job-expanded-snippet">${escapeHtml(truncate(cleanDescription, 200))}</p>
           ` : ''}
 
           <!-- Quick Action Hyperlinks / Buttons -->
           <div class="job-expanded-actions">
             <button type="button" class="btn btn-ghost btn-sm job-details-btn" data-job-id="${escapeHtml(job.id)}" style="padding:4px 10px; font-size:0.78rem;">
               <span class="material-symbols-rounded" style="font-size:15px;">article</span>
-              Details
+              Full Details
             </button>
             <a class="btn btn-ghost btn-sm job-posting-link" href="${escapeHtml(job.url)}" target="_blank" rel="noopener noreferrer" style="padding:4px 10px; font-size:0.78rem; text-decoration:none;">
               <span>View Posting</span>
@@ -1407,22 +1411,25 @@
 
     // Meta items
     let metaHtml = `
-      <div class="modal-meta">
-        <span class="job-meta-item">📍 ${escapeHtml(job.location)}</span>
+      <div class="modal-meta" style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:18px;">
+        <span class="job-meta-item">📍 ${escapeHtml(job.location || 'Worldwide Remote')}</span>
+        ${job.seniority ? `<span class="job-meta-item" style="color:#818cf8; background:rgba(99,102,241,0.12); border-color:rgba(99,102,241,0.3);">🎓 ${escapeHtml(job.seniority)}</span>` : ''}
+        ${job.jobType ? `<span class="job-meta-item">💼 ${escapeHtml(job.jobType)}</span>` : ''}
         ${job.salary ? `<span class="job-meta-item salary">💰 ${escapeHtml(job.salary)}</span>` : ''}
         <span class="job-meta-item source-badge">🔗 ${escapeHtml(job.source)}</span>
         <span class="job-meta-item">📅 ${job.daysAgo !== null ? (job.daysAgo === 0 ? 'Today' : `${job.daysAgo}d ago`) : 'Recent'}</span>
-        <span class="job-meta-item">🎯 ${job.matchScore}% match</span>
+        <span class="job-meta-item" style="color:#10b981; font-weight:700;">🎯 ${job.matchScore}% Match</span>
       </div>
     `;
 
     // Matched skills
     let matchedHtml = '';
-    if (job.matchedSkills && job.matchedSkills.length > 0) {
+    const allMatches = [...(job.matchedSkills || []), ...(job.matchedKeywords || [])];
+    if (allMatches.length > 0) {
       matchedHtml = `
-        <h4>✅ Matched Skills</h4>
-        <div class="skill-pills" style="margin-bottom: 16px;">
-          ${job.matchedSkills.map(s => `<span class="skill-pill matched">${escapeHtml(s)}</span>`).join('')}
+        <h4 style="margin-bottom:8px; font-size:0.9rem; color:var(--md-sys-color-primary);">✅ Matched Skills &amp; Keywords</h4>
+        <div class="skill-pills" style="margin-bottom: 18px; display:flex; flex-wrap:wrap; gap:6px;">
+          ${allMatches.map(s => `<span class="skill-pill matched" style="font-size:0.75rem; padding:3px 8px;">✓ ${escapeHtml(String(s))}</span>`).join('')}
         </div>
       `;
     }
@@ -1436,32 +1443,41 @@
 
     if (modalTags.length > 0) {
       tagsHtml = `
-        <h4>🏷️ Tags</h4>
-        <div class="job-tags" style="margin-bottom: 16px;">
+        <h4 style="margin-bottom:8px; font-size:0.9rem; color:var(--md-sys-color-on-surface-variant);">🏷️ Technologies &amp; Categories</h4>
+        <div class="job-tags" style="margin-bottom: 18px; display:flex; flex-wrap:wrap; gap:6px;">
           ${modalTags.map(t => {
             const tagStr = String(t);
             const isMatched = matchedLower.includes(tagStr.toLowerCase());
-            return `<span class="job-tag${isMatched ? ' matched' : ''}">${escapeHtml(tagStr)}</span>`;
+            return `<span class="job-tag${isMatched ? ' matched' : ''}" style="font-size:0.75rem; padding:3px 8px;">${escapeHtml(tagStr)}</span>`;
           }).join('')}
         </div>
       `;
     }
 
-    // Description
-    const desc = job.fullDescription || job.description || 'No description available.';
+    // Format rich full description
+    const rawDesc = job.descriptionHtml || job.fullDescription || job.description || 'No description available.';
+    let descBodyHtml = rawDesc;
+    if (!rawDesc.includes('<p>') && !rawDesc.includes('<div>') && !rawDesc.includes('<ul>')) {
+      descBodyHtml = rawDesc
+        .split('\n\n')
+        .map(p => `<p style="margin-bottom:12px; line-height:1.7; color:var(--md-sys-color-on-surface-variant); font-size:0.88rem;">${escapeHtml(p)}</p>`)
+        .join('');
+    }
 
     els.modalTitle.textContent = `${job.title} — ${job.company}`;
     els.modalBody.innerHTML = `
       <div style="margin-bottom:16px;">
         <a class="btn btn-primary job-posting-link" href="${escapeHtml(job.url)}" target="_blank" rel="noopener noreferrer" style="width:100%; padding:12px; justify-content:center; text-decoration:none; font-weight:700; background:linear-gradient(135deg, var(--accent-primary), #4f46e5); color:#ffffff; display:flex; align-items:center; gap:8px;">
-          🌐 Apply Direct on ${escapeHtml(job.source)} Website ↗
+          🌐 Open &amp; Apply Direct on ${escapeHtml(job.source)} ↗
         </a>
       </div>
       ${metaHtml}
       ${matchedHtml}
       ${tagsHtml}
-      <h4>📝 Full Description</h4>
-      <div style="white-space: pre-line; line-height: 1.7; color: var(--text-secondary);">${escapeHtml(desc)}</div>
+      <h4 style="margin-bottom:10px; font-size:0.95rem; color:var(--md-sys-color-on-surface); border-top:1px solid var(--md-sys-color-outline-variant); padding-top:14px;">📝 Complete Job Description</h4>
+      <div class="job-modal-description" style="line-height: 1.7; color: var(--md-sys-color-on-surface-variant); font-size:0.88rem; max-height:450px; overflow-y:auto; padding-right:6px;">
+        ${descBodyHtml}
+      </div>
     `;
 
     if (els.modalApplyLink) {
