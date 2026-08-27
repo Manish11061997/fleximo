@@ -228,14 +228,15 @@
           titles: ['Software Engineer', 'Full Stack Developer'],
           keywords: ['developer', 'engineer', 'software'],
           experience: { level: 'mid' },
-          maxDays: 30
+          maxDays: 60
         })
       });
       if (!response.ok) return;
-      const data = await response.json();
-      if (data && (data.global?.length > 0 || data.worldwide?.length > 0)) {
-        state.results = data;
-        displayResults(data, true);
+      const json = await response.json();
+      const jobData = json.data || json;
+      if (jobData && (jobData.global?.length > 0 || jobData.worldwide?.length > 0 || jobData.india?.length > 0)) {
+        state.results = jobData;
+        displayResults(jobData, true);
       }
     } catch (err) {
       console.warn('Initial live feed fetch:', err.message);
