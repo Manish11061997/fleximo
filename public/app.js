@@ -1253,9 +1253,11 @@
 
       // Search query filter (live text search)
       if (state.searchQuery) {
-        const query = state.searchQuery.toLowerCase();
+        const query = state.searchQuery.toLowerCase().trim();
         const searchText = [
           job.title, job.company, job.location,
+          job.description || '', job.fullDescription || '',
+          job.seniority || '', job.jobType || '',
           job.remoteTypeLabel, job.countryLabel,
           ...(job.tags || []), ...(job.matchedSkills || []), ...(job.matchedKeywords || [])
         ].join(' ').toLowerCase();
