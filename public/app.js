@@ -218,8 +218,31 @@
     }
   }
 
+  function renderSkeletons(targetList, count = 4) {
+    if (!targetList) return;
+    targetList.innerHTML = Array.from({ length: count }).map((_, i) => `
+      <div class="skeleton-card" style="animation-delay: ${i * 0.08}s">
+        <div class="skeleton-avatar skeleton-shimmer"></div>
+        <div class="skeleton-content">
+          <div class="skeleton-line skeleton-title skeleton-shimmer"></div>
+          <div class="skeleton-line skeleton-subline skeleton-shimmer"></div>
+          <div class="skeleton-tags">
+            <span class="skeleton-tag skeleton-shimmer"></span>
+            <span class="skeleton-tag skeleton-shimmer"></span>
+          </div>
+        </div>
+        <div class="skeleton-badge skeleton-shimmer"></div>
+      </div>
+    `).join('');
+  }
+
   async function fetchInitialLiveJobs() {
     try {
+      if (els.resultsSection && els.jobListWorldwide) {
+        els.resultsSection.style.display = 'block';
+        els.jobListWorldwide.style.display = 'grid';
+        renderSkeletons(els.jobListWorldwide, 5);
+      }
       const response = await fetch('/api/search-jobs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -237,6 +260,7 @@
       if (jobData && (jobData.global?.length > 0 || jobData.worldwide?.length > 0 || jobData.india?.length > 0)) {
         state.results = jobData;
         displayResults(jobData, true);
+        collapseUploadSection();
       }
     } catch (err) {
       console.warn('Initial live feed fetch:', err.message);
@@ -863,7 +887,13 @@
           : 'Matching Remote Jobs to Your Resume...';
       }
     }
-    els.resultsSection.style.display = 'none';
+    if (els.resultsSection) els.resultsSection.style.display = 'block';
+    const currentList = state.activeTab === 'worldwide' ? els.jobListWorldwide : (state.activeTab === 'india' ? els.jobListIndia : els.jobListGlobal);
+    if (currentList) {
+      els.emptyState.style.display = 'none';
+      currentList.style.display = 'grid';
+      renderSkeletons(currentList, 4);
+    }
 
     // Animate source chips
     animateSourceChips();
@@ -1320,6 +1350,22 @@
       .replace(/\s+/g, ' ')
       .trim();
 
+    const matchedList = [...(job.matchedSkills || []), ...(job.matchedKeywords || [])];
+    const rawSkills = matchedList.length > 0 ? matchedList : (job.tags || []);
+    const uniqueSkills = Array.from(new Set(rawSkills.map(s => String(s).trim()))).filter(Boolean);
+    const topSkills = uniqueSkills.slice(0, 3);
+    const remainingCount = Math.max(0, uniqueSkills.length - topSkills.length);
+
+    const skillsRowHtml = topSkills.length > 0 ? `
+      <div class="job-card-tags-row">
+        ${topSkills.map(s => {
+          const isMatched = matchedList.some(m => String(m).toLowerCase() === s.toLowerCase());
+          return `<span class="job-mini-tag ${isMatched ? 'matched' : ''}">${isMatched ? '✓ ' : ''}${escapeHtml(s)}</span>`;
+        }).join('')}
+        ${remainingCount > 0 ? `<span class="job-mini-tag-more">+${remainingCount} more</span>` : ''}
+      </div>
+    ` : '';
+
     return `
       <article class="job-card ${isWorldwide ? 'worldwide-job' : 'regional-job'}"
                data-job-id="${escapeHtml(job.id)}"
@@ -1353,10 +1399,24 @@
                 <span class="job-subline-dot">•</span>
                 <span class="job-date">${dateText}</span>
               </div>
+              ${skillsRowHtml}
             </div>
           </div>
 
           <div class="job-card-summary-right">
+            <div class="job-card-quick-actions">
+              <button type="button" class="btn btn-ghost btn-sm job-details-btn" data-job-id="${escapeHtml(job.id)}" title="View complete job description">
+                <span class="material-symbols-rounded">article</span>
+                <span class="action-btn-text">Details</span>
+              </button>
+              <a class="btn btn-ghost btn-sm job-posting-link" href="${escapeHtml(job.url)}" target="_blank" rel="noopener noreferrer" title="Open original job posting">
+                <span class="material-symbols-rounded">open_in_new</span>
+              </a>
+              <button type="button" class="btn btn-primary btn-sm job-auto-apply-btn" data-job-id="${escapeHtml(job.id)}" title="One-click apply">
+                <span class="material-symbols-rounded">send</span>
+                <span class="action-btn-text">Apply</span>
+              </button>
+            </div>
             <div class="match-score-badge ${scoreClass}" title="${job.matchScore}% match">
               ${job.matchScore}%
             </div>
@@ -1542,8 +1602,12 @@
         const alertModal = document.getElementById('alert-modal-overlay');
         if (alertModal) {
           alertModal.style.display = 'none';
-          document.body.style.overflow = '';
         }
+        const filtersModal = document.getElementById('filters-modal-overlay');
+        if (filtersModal) {
+          filtersModal.style.display = 'none';
+        }
+        document.body.style.overflow = '';
       }
     });
   }
@@ -1878,13 +1942,28 @@
 
     // Debounced live text search
     let searchTimeout;
+    const quickSearchClearBtn = $('#quick-search-clear-btn');
     if (els.searchInput) {
       els.searchInput.addEventListener('input', (e) => {
+        const val = e.target.value.trim();
+        if (quickSearchClearBtn) quickSearchClearBtn.style.display = val ? 'flex' : 'none';
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(() => {
           state.searchQuery = e.target.value;
           renderJobList();
         }, 150);
+      });
+    }
+
+    if (quickSearchClearBtn) {
+      quickSearchClearBtn.addEventListener('click', () => {
+        if (els.searchInput) {
+          els.searchInput.value = '';
+          state.searchQuery = '';
+          quickSearchClearBtn.style.display = 'none';
+          renderJobList();
+          els.searchInput.focus();
+        }
       });
     }
 

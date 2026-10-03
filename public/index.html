@@ -110,11 +110,11 @@
           </div>
 
           <!-- Direct Keyword Search Box -->
-          <div class="direct-keyword-search" style="margin-top: 24px;">
-            <form id="direct-search-form" style="display: flex; gap: 10px; max-width: 700px; margin: 0 auto; align-items: center; background: var(--glass-bg); padding: 8px 12px; border-radius: var(--radius-lg); border: 1px solid var(--glass-border);">
-              <span style="font-size: 1.2rem; margin-left: 8px;">🔍</span>
-              <input type="text" id="direct-keyword-input" class="filter-input" style="flex: 1; border: none; background: transparent; padding: 10px 8px; font-size: 1rem; color: var(--text-primary);" placeholder="Search by keywords, job title, or tech stack (e.g. React, Python, Java, AWS, Flutter)..." required>
-              <button type="submit" class="btn btn-primary" id="direct-keyword-btn" style="padding: 10px 24px;">Search Jobs</button>
+          <div class="direct-keyword-search">
+            <form id="direct-search-form">
+              <span class="direct-search-icon">🔍</span>
+              <input type="text" id="direct-keyword-input" placeholder="Search by job title, skill, or keyword (e.g. React, Python, DevOps)..." required>
+              <button type="submit" class="btn btn-primary" id="direct-keyword-btn">Search Jobs</button>
             </form>
           </div>
 
@@ -257,7 +257,7 @@
             <button class="tab" id="tab-applied" data-tab="applied">
               <span class="tab-emoji">📋</span>
               <span class="tab-text">Applied</span>
-              <span class="tab-count" id="tab-applied-count" style="background:var(--accent-primary);">0</span>
+              <span class="tab-count" id="tab-applied-count">0</span>
             </button>
             <div class="tab-indicator" id="tab-indicator"></div>
           </div>
@@ -266,7 +266,8 @@
           <div class="quick-filter-bar">
             <div class="quick-search-wrapper">
               <span class="material-symbols-rounded" style="font-size: 17px; color: var(--md-sys-color-outline);">search</span>
-              <input type="text" class="quick-search-input" id="search-input" placeholder="Search title, company, skill...">
+              <input type="text" class="quick-search-input" id="search-input" placeholder="Filter jobs by title, company, skill...">
+              <button type="button" class="quick-search-clear-btn" id="quick-search-clear-btn" style="display:none;" title="Clear filter">&times;</button>
             </div>
 
             <!-- Desktop Inline Filter Dropdowns (Visible on > 768px) -->
