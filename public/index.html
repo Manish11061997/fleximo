@@ -238,24 +238,29 @@
           </div>
 
           <!-- Tabs -->
-          <div class="tabs" id="tabs">
-            <button class="tab active" id="tab-worldwide" data-tab="worldwide">
-              <span class="tab-emoji">🌐</span>
+          <div class="tabs" id="tabs" role="tablist" aria-label="Job categories">
+            <button class="tab active" id="tab-worldwide" data-tab="worldwide" role="tab" aria-selected="true">
+              <span class="material-symbols-rounded tab-icon">public</span>
               <span class="tab-text">Worldwide</span>
               <span class="tab-count" id="tab-worldwide-count">0</span>
             </button>
-            <button class="tab" id="tab-india" data-tab="india">
-              <span class="tab-emoji">🇮🇳</span>
+            <button class="tab" id="tab-india" data-tab="india" role="tab" aria-selected="false">
+              <span class="material-symbols-rounded tab-icon">location_on</span>
               <span class="tab-text">India</span>
               <span class="tab-count" id="tab-india-count">0</span>
             </button>
-            <button class="tab" id="tab-global" data-tab="global">
-              <span class="tab-emoji">🌍</span>
+            <button class="tab" id="tab-global" data-tab="global" role="tab" aria-selected="false">
+              <span class="material-symbols-rounded tab-icon">language</span>
               <span class="tab-text">All Remote</span>
               <span class="tab-count" id="tab-global-count">0</span>
             </button>
-            <button class="tab" id="tab-applied" data-tab="applied">
-              <span class="tab-emoji">📋</span>
+            <button class="tab" id="tab-saved" data-tab="saved" role="tab" aria-selected="false">
+              <span class="material-symbols-rounded tab-icon">bookmark</span>
+              <span class="tab-text">Saved</span>
+              <span class="tab-count" id="tab-saved-count">0</span>
+            </button>
+            <button class="tab" id="tab-applied" data-tab="applied" role="tab" aria-selected="false">
+              <span class="material-symbols-rounded tab-icon">task_alt</span>
               <span class="tab-text">Applied</span>
               <span class="tab-count" id="tab-applied-count">0</span>
             </button>
@@ -398,6 +403,7 @@
           <div class="job-list" id="job-list-worldwide"></div>
           <div class="job-list" id="job-list-india" style="display:none;"></div>
           <div class="job-list" id="job-list-global" style="display:none;"></div>
+          <div class="job-list" id="job-list-saved" style="display:none;"></div>
           <div class="job-list" id="job-list-applied" style="display:none;"></div>
 
           <!-- Empty state -->

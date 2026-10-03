@@ -1084,6 +1084,12 @@ details[open] .profile-collapse-arrow { transform: rotate(180deg); }
 
 .tab-indicator { display: none; }
 
+.tab-icon {
+  font-size: 16px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
 /* ─── Results Top Search Bar ───────────────────────────────────────── */
 .results-search-bar {
   margin-bottom: var(--space-3);
@@ -1420,6 +1426,8 @@ details[open] .profile-collapse-arrow { transform: rotate(180deg); }
   border-radius: var(--md-shape-lg);
   padding: 16px 20px;
   box-shadow: var(--md-sys-elevation-1);
+  content-visibility: auto;
+  contain-intrinsic-size: 0 95px;
   transition: transform var(--md-motion-duration-short) var(--md-motion-easing),
               box-shadow var(--md-motion-duration-short) var(--md-motion-easing),
               border-color var(--md-motion-duration-short) var(--md-motion-easing),
@@ -1557,6 +1565,29 @@ details[open] .profile-collapse-arrow { transform: rotate(180deg); }
 
 .job-card-quick-actions .material-symbols-rounded {
   font-size: 15px;
+}
+
+.job-save-btn {
+  padding: 4px 8px !important;
+  font-size: 0.78rem !important;
+  height: 32px !important;
+  gap: 3px !important;
+  color: var(--md-sys-color-on-surface-variant);
+  transition: all var(--md-motion-duration-short) var(--md-motion-easing);
+}
+
+.job-save-btn:hover {
+  color: var(--md-sys-color-primary);
+  background-color: var(--md-sys-color-surface-container-highest);
+}
+
+.job-save-btn.saved {
+  color: var(--md-sys-color-primary) !important;
+  font-weight: 700;
+}
+
+.job-save-btn.saved .material-symbols-rounded {
+  color: var(--md-sys-color-primary);
 }
 
 /* Job Mini Tags on Collapsed Card */
@@ -2169,6 +2200,10 @@ details[open] .profile-collapse-arrow { transform: rotate(180deg); }
     display: none;
   }
 
+  .bg-orb {
+    display: none !important;
+  }
+
   .header-stats {
     display: none !important;
   }
@@ -2570,7 +2605,7 @@ details[open] .profile-collapse-arrow { transform: rotate(180deg); }
 
   .job-expanded-actions {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: repeat(4, 1fr);
     gap: 4px;
     width: 100%;
     padding-top: 6px;
@@ -2752,6 +2787,25 @@ details[open] .profile-collapse-arrow { transform: rotate(180deg); }
   .modal-footer {
     padding: 10px 12px;
   }
+}
+
+/* ─── Accessibility & Reduced Motion ───────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .skeleton-shimmer {
+    animation: none !important;
+    background: var(--md-sys-color-surface-container-highest) !important;
+  }
+}
+
+:focus-visible {
+  outline: 2px solid var(--md-sys-color-primary);
+  outline-offset: 2px;
 }
 
 

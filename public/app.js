@@ -15,6 +15,7 @@
     remoteType: 'all',        // 'all' | 'worldwide' | 'country_restricted'
     countryScope: 'all',      // 'all' | 'worldwide' | 'india' | 'us' | 'europe' | 'apac' | 'latam'
     searchQuery: '',
+    savedJobs: JSON.parse(localStorage.getItem('remote_job_agent_saved') || '[]'),
     appliedJobs: JSON.parse(localStorage.getItem('remote_job_agent_applied') || '[]'),
     candidateProfile: {},
     targetJobForApply: null
@@ -54,15 +55,18 @@
     tabWorldwide: $('#tab-worldwide'),
     tabIndia: $('#tab-india'),
     tabGlobal: $('#tab-global'),
+    tabSaved: $('#tab-saved'),
     tabApplied: $('#tab-applied'),
     tabWorldwideCount: $('#tab-worldwide-count'),
     tabIndiaCount: $('#tab-india-count'),
     tabGlobalCount: $('#tab-global-count'),
+    tabSavedCount: $('#tab-saved-count'),
     tabAppliedCount: $('#tab-applied-count'),
     tabIndicator: $('#tab-indicator'),
     jobListWorldwide: $('#job-list-worldwide'),
     jobListIndia: $('#job-list-india'),
     jobListGlobal: $('#job-list-global'),
+    jobListSaved: $('#job-list-saved'),
     jobListApplied: $('#job-list-applied'),
     emptyState: $('#empty-state'),
     sortSelect: $('#sort-select'),
@@ -184,6 +188,7 @@
     bindProfileEditEvents();
     bindSmtpTestEvents();
     updateCandidateProfileDisplay();
+    updateSavedCount();
     fetchApplications();
     restoreAppState();
   }
@@ -981,6 +986,7 @@
     if (els.tabWorldwideCount) els.tabWorldwideCount.textContent = data.worldwide?.length || 0;
     if (els.tabIndiaCount) els.tabIndiaCount.textContent = data.india?.length || 0;
     if (els.tabGlobalCount) els.tabGlobalCount.textContent = data.global?.length || 0;
+    if (els.tabSavedCount) els.tabSavedCount.textContent = state.savedJobs.length;
     if (els.tabAppliedCount) {
       els.tabAppliedCount.textContent = state.appliedJobs.length;
     }
@@ -1013,56 +1019,64 @@
   }
 
   // ─── Render Job List ──────────────────────────────────────────────────────
-  function renderJobList() {
-    if (els.tabAppliedCount) {
-      els.tabAppliedCount.textContent = state.appliedJobs.length;
-    }
+  function isJobSaved(jobId) {
+    return state.savedJobs.some(j => j.id === jobId);
+  }
 
-    if (state.activeTab === 'applied') {
-      renderAppliedJobList();
-      return;
-    }
-
-    if (!state.results) return;
-
-    let jobs = [];
-    if (state.activeTab === 'worldwide') {
-      jobs = state.results.worldwide || state.results.global?.filter(j => j.isWorldwide || j.remoteType === 'worldwide') || [];
-    } else if (state.activeTab === 'india') {
-      jobs = state.results.india || [];
+  function toggleSaveJob(job) {
+    if (!job || !job.id) return;
+    const idx = state.savedJobs.findIndex(j => j.id === job.id);
+    const wasSaved = idx !== -1;
+    if (wasSaved) {
+      state.savedJobs.splice(idx, 1);
     } else {
-      jobs = state.results.global || [];
+      state.savedJobs.push({
+        ...job,
+        savedAt: new Date().toISOString()
+      });
     }
+    localStorage.setItem('remote_job_agent_saved', JSON.stringify(state.savedJobs));
+    updateSavedCount();
 
-    // Apply filters
-    let filtered = filterJobs(jobs);
+    // Toggle icon state on all matching buttons
+    document.querySelectorAll(`.job-save-btn[data-job-id="${CSS.escape(job.id)}"]`).forEach(btn => {
+      if (wasSaved) {
+        btn.classList.remove('saved');
+        btn.title = 'Save Job';
+        const icon = btn.querySelector('.material-symbols-rounded');
+        if (icon) {
+          icon.textContent = 'bookmark_border';
+          icon.style.color = '';
+          icon.style.fontVariationSettings = '';
+        }
+        const text = btn.querySelector('.action-btn-text, span:not(.material-symbols-rounded)');
+        if (text) text.textContent = 'Save';
+      } else {
+        btn.classList.add('saved');
+        btn.title = 'Remove from Saved';
+        const icon = btn.querySelector('.material-symbols-rounded');
+        if (icon) {
+          icon.textContent = 'bookmark_added';
+          icon.style.color = 'var(--md-sys-color-primary)';
+          icon.style.fontVariationSettings = "'FILL' 1";
+        }
+        const text = btn.querySelector('.action-btn-text, span:not(.material-symbols-rounded)');
+        if (text) text.textContent = 'Saved';
+      }
+    });
 
-    // Apply sort
-    filtered = sortJobs(filtered);
-
-    // Show/hide lists
-    if (els.jobListWorldwide) els.jobListWorldwide.style.display = state.activeTab === 'worldwide' ? 'grid' : 'none';
-    if (els.jobListIndia) els.jobListIndia.style.display = state.activeTab === 'india' ? 'grid' : 'none';
-    if (els.jobListGlobal) els.jobListGlobal.style.display = state.activeTab === 'global' ? 'grid' : 'none';
-    if (els.jobListApplied) els.jobListApplied.style.display = 'none';
-
-    let targetList;
-    if (state.activeTab === 'worldwide') targetList = els.jobListWorldwide;
-    else if (state.activeTab === 'india') targetList = els.jobListIndia;
-    else targetList = els.jobListGlobal;
-
-    if (!targetList) return;
-
-    if (filtered.length === 0) {
-      targetList.innerHTML = '';
-      els.emptyState.style.display = 'flex';
-      return;
+    if (state.activeTab === 'saved') {
+      renderSavedJobList();
     }
+  }
 
-    els.emptyState.style.display = 'none';
-    targetList.innerHTML = filtered.map((job, index) => createJobCard(job, index)).join('');
+  function updateSavedCount() {
+    if (els.tabSavedCount) {
+      els.tabSavedCount.textContent = state.savedJobs.length;
+    }
+  }
 
-    // Bind click events on job cards for collapsible accordion
+  function bindJobCardClickEvents(targetList) {
     targetList.querySelectorAll('.job-card').forEach(card => {
       card.addEventListener('click', (e) => {
         // If clicking a direct external posting link, let browser open target="_blank" natively!
@@ -1072,8 +1086,19 @@
         }
 
         const jobId = card.dataset.jobId;
-        const allJobs = [...(state.results.worldwide || []), ...(state.results.india || []), ...(state.results.global || [])];
+        const allJobs = [
+          ...(state.results?.worldwide || []),
+          ...(state.results?.india || []),
+          ...(state.results?.global || []),
+          ...state.savedJobs
+        ];
         const job = allJobs.find(j => j.id === jobId);
+
+        if (e.target.closest('.job-save-btn')) {
+          e.stopPropagation();
+          if (job) toggleSaveJob(job);
+          return;
+        }
 
         if (e.target.closest('.job-details-btn')) {
           e.stopPropagation();
@@ -1108,6 +1133,104 @@
         }
       });
     });
+  }
+
+  // ─── Render Saved Job List ────────────────────────────────────────────────
+  function renderSavedJobList() {
+    if (!els.jobListSaved) return;
+
+    if (els.jobListWorldwide) els.jobListWorldwide.style.display = 'none';
+    if (els.jobListIndia) els.jobListIndia.style.display = 'none';
+    if (els.jobListGlobal) els.jobListGlobal.style.display = 'none';
+    if (els.jobListApplied) els.jobListApplied.style.display = 'none';
+    els.jobListSaved.style.display = 'grid';
+    els.emptyState.style.display = 'none';
+
+    updateSavedCount();
+
+    if (state.savedJobs.length === 0) {
+      els.jobListSaved.innerHTML = `
+        <div style="grid-column: 1 / -1; text-align:center; padding: 40px; background:var(--glass-bg); border-radius:var(--radius-lg); border:1px solid var(--glass-border);">
+          <div style="font-size:2.5rem; margin-bottom:12px;">🔖</div>
+          <h3 style="margin-bottom:6px; color:var(--text-primary);">No Saved Jobs Yet</h3>
+          <p style="color:var(--text-secondary); font-size:0.9rem;">Click the bookmark icon on any job card to save it for later review.</p>
+        </div>
+      `;
+      return;
+    }
+
+    let savedList = filterJobs(state.savedJobs);
+    savedList = sortJobs(savedList);
+
+    if (savedList.length === 0) {
+      els.jobListSaved.innerHTML = '';
+      els.emptyState.style.display = 'flex';
+      return;
+    }
+
+    els.jobListSaved.innerHTML = savedList.map((job, index) => createJobCard(job, index)).join('');
+    bindJobCardClickEvents(els.jobListSaved);
+  }
+
+  // ─── Render Job List ──────────────────────────────────────────────────────
+  function renderJobList() {
+    if (els.tabAppliedCount) {
+      els.tabAppliedCount.textContent = state.appliedJobs.length;
+    }
+    if (els.tabSavedCount) {
+      els.tabSavedCount.textContent = state.savedJobs.length;
+    }
+
+    if (state.activeTab === 'saved') {
+      renderSavedJobList();
+      return;
+    }
+
+    if (state.activeTab === 'applied') {
+      renderAppliedJobList();
+      return;
+    }
+
+    if (!state.results) return;
+
+    let jobs = [];
+    if (state.activeTab === 'worldwide') {
+      jobs = state.results.worldwide || state.results.global?.filter(j => j.isWorldwide || j.remoteType === 'worldwide') || [];
+    } else if (state.activeTab === 'india') {
+      jobs = state.results.india || [];
+    } else {
+      jobs = state.results.global || [];
+    }
+
+    // Apply filters
+    let filtered = filterJobs(jobs);
+
+    // Apply sort
+    filtered = sortJobs(filtered);
+
+    // Show/hide lists
+    if (els.jobListWorldwide) els.jobListWorldwide.style.display = state.activeTab === 'worldwide' ? 'grid' : 'none';
+    if (els.jobListIndia) els.jobListIndia.style.display = state.activeTab === 'india' ? 'grid' : 'none';
+    if (els.jobListGlobal) els.jobListGlobal.style.display = state.activeTab === 'global' ? 'grid' : 'none';
+    if (els.jobListSaved) els.jobListSaved.style.display = 'none';
+    if (els.jobListApplied) els.jobListApplied.style.display = 'none';
+
+    let targetList;
+    if (state.activeTab === 'worldwide') targetList = els.jobListWorldwide;
+    else if (state.activeTab === 'india') targetList = els.jobListIndia;
+    else targetList = els.jobListGlobal;
+
+    if (!targetList) return;
+
+    if (filtered.length === 0) {
+      targetList.innerHTML = '';
+      els.emptyState.style.display = 'flex';
+      return;
+    }
+
+    els.emptyState.style.display = 'none';
+    targetList.innerHTML = filtered.map((job, index) => createJobCard(job, index)).join('');
+    bindJobCardClickEvents(targetList);
   }
 
   // ─── Render Applied Job List ──────────────────────────────────────────────
@@ -1344,6 +1467,7 @@
     }).join('');
 
     const isWorldwide = job.regionInfo?.isWorldwide || job.remoteType === 'worldwide';
+    const isSaved = isJobSaved(job.id);
 
     const cleanDescription = (job.description || '')
       .replace(/<[^>]*>/g, ' ')
@@ -1386,15 +1510,22 @@
                 <span class="job-company">${escapeHtml(job.company)}</span>
                 <span class="job-subline-dot">•</span>
                 <span class="job-meta-pill ${isWorldwide ? 'pill-worldwide' : 'pill-regional'}">
-                  ${isWorldwide ? '🌐 Worldwide' : (job.regionInfo?.badge || '📍 Remote')}
+                  <span class="material-symbols-rounded" style="font-size:13px; line-height:1;">${isWorldwide ? 'public' : 'location_on'}</span>
+                  ${isWorldwide ? 'Worldwide' : (job.regionInfo?.badge || 'Remote')}
                 </span>
                 ${job.seniority && job.seniority !== 'All Experience Levels' ? `
                   <span class="job-subline-dot">•</span>
-                  <span class="job-meta-pill pill-seniority" style="font-size:0.72rem; background:rgba(99,102,241,0.12); color:#818cf8; border:1px solid rgba(99,102,241,0.25);">🎓 ${escapeHtml(job.seniority)}</span>
+                  <span class="job-meta-pill pill-seniority" style="font-size:0.72rem; background:rgba(99,102,241,0.12); color:#818cf8; border:1px solid rgba(99,102,241,0.25);">
+                    <span class="material-symbols-rounded" style="font-size:13px; line-height:1;">school</span>
+                    ${escapeHtml(job.seniority)}
+                  </span>
                 ` : ''}
                 ${job.salary ? `
                   <span class="job-subline-dot">•</span>
-                  <span class="job-meta-pill pill-salary">💰 ${escapeHtml(job.salary)}</span>
+                  <span class="job-meta-pill pill-salary">
+                    <span class="material-symbols-rounded" style="font-size:13px; line-height:1;">payments</span>
+                    ${escapeHtml(job.salary)}
+                  </span>
                 ` : ''}
                 <span class="job-subline-dot">•</span>
                 <span class="job-date">${dateText}</span>
@@ -1405,6 +1536,10 @@
 
           <div class="job-card-summary-right">
             <div class="job-card-quick-actions">
+              <button type="button" class="btn btn-ghost btn-sm job-save-btn ${isSaved ? 'saved' : ''}" data-job-id="${escapeHtml(job.id)}" title="${isSaved ? 'Remove from Saved' : 'Save Job'}">
+                <span class="material-symbols-rounded" style="${isSaved ? 'color:var(--md-sys-color-primary); font-variation-settings:\'FILL\' 1;' : ''}">${isSaved ? 'bookmark_added' : 'bookmark_border'}</span>
+                <span class="action-btn-text">${isSaved ? 'Saved' : 'Save'}</span>
+              </button>
               <button type="button" class="btn btn-ghost btn-sm job-details-btn" data-job-id="${escapeHtml(job.id)}" title="View complete job description">
                 <span class="material-symbols-rounded">article</span>
                 <span class="action-btn-text">Details</span>
@@ -1438,9 +1573,9 @@
               </div>
             ` : ''}
             <div class="job-expanded-meta-inline">
-              <span>📍 ${escapeHtml(job.location || 'Remote')}</span>
+              <span><span class="material-symbols-rounded" style="font-size:14px; vertical-align:middle;">location_on</span> ${escapeHtml(job.location || 'Remote')}</span>
               <span>•</span>
-              <span>🔗 ${escapeHtml(job.source)}</span>
+              <span><span class="material-symbols-rounded" style="font-size:14px; vertical-align:middle;">link</span> ${escapeHtml(job.source)}</span>
             </div>
           </div>
 
@@ -1450,17 +1585,21 @@
 
           <!-- Quick Action Hyperlinks / Buttons -->
           <div class="job-expanded-actions">
-            <button type="button" class="btn btn-ghost btn-sm job-details-btn" data-job-id="${escapeHtml(job.id)}" style="padding:4px 10px; font-size:0.78rem;">
-              <span class="material-symbols-rounded" style="font-size:15px;">article</span>
-              Full Details
+            <button type="button" class="btn btn-ghost btn-sm job-save-btn ${isSaved ? 'saved' : ''}" data-job-id="${escapeHtml(job.id)}" style="padding:4px 6px; font-size:0.75rem;">
+              <span class="material-symbols-rounded" style="font-size:15px; ${isSaved ? 'color:var(--md-sys-color-primary); font-variation-settings:\'FILL\' 1;' : ''}">${isSaved ? 'bookmark_added' : 'bookmark_border'}</span>
+              <span>${isSaved ? 'Saved' : 'Save'}</span>
             </button>
-            <a class="btn btn-ghost btn-sm job-posting-link" href="${escapeHtml(job.url)}" target="_blank" rel="noopener noreferrer" style="padding:4px 10px; font-size:0.78rem; text-decoration:none;">
-              <span>View Posting</span>
+            <button type="button" class="btn btn-ghost btn-sm job-details-btn" data-job-id="${escapeHtml(job.id)}" style="padding:4px 6px; font-size:0.75rem;">
+              <span class="material-symbols-rounded" style="font-size:15px;">article</span>
+              <span>Details</span>
+            </button>
+            <a class="btn btn-ghost btn-sm job-posting-link" href="${escapeHtml(job.url)}" target="_blank" rel="noopener noreferrer" style="padding:4px 6px; font-size:0.75rem; text-decoration:none;">
+              <span>View</span>
               <span class="material-symbols-rounded" style="font-size:14px;">open_in_new</span>
             </a>
-            <button type="button" class="btn btn-primary btn-sm job-auto-apply-btn" data-job-id="${escapeHtml(job.id)}" style="padding:4px 12px; font-size:0.78rem;">
+            <button type="button" class="btn btn-primary btn-sm job-auto-apply-btn" data-job-id="${escapeHtml(job.id)}" style="padding:4px 8px; font-size:0.75rem;">
               <span class="material-symbols-rounded" style="font-size:15px;">send</span>
-              Auto-Apply
+              <span>Apply</span>
             </button>
           </div>
         </div>
@@ -1816,6 +1955,7 @@
     if (els.tabWorldwide) els.tabWorldwide.addEventListener('click', () => switchTab('worldwide'));
     if (els.tabIndia) els.tabIndia.addEventListener('click', () => switchTab('india'));
     if (els.tabGlobal) els.tabGlobal.addEventListener('click', () => switchTab('global'));
+    if (els.tabSaved) els.tabSaved.addEventListener('click', () => switchTab('saved'));
     if (els.tabApplied) els.tabApplied.addEventListener('click', () => switchTab('applied'));
   }
 
@@ -1823,10 +1963,26 @@
     state.activeTab = tab;
     saveAppState();
 
-    if (els.tabWorldwide) els.tabWorldwide.classList.toggle('active', tab === 'worldwide');
-    if (els.tabIndia) els.tabIndia.classList.toggle('active', tab === 'india');
-    if (els.tabGlobal) els.tabGlobal.classList.toggle('active', tab === 'global');
-    if (els.tabApplied) els.tabApplied.classList.toggle('active', tab === 'applied');
+    if (els.tabWorldwide) {
+      els.tabWorldwide.classList.toggle('active', tab === 'worldwide');
+      els.tabWorldwide.setAttribute('aria-selected', tab === 'worldwide');
+    }
+    if (els.tabIndia) {
+      els.tabIndia.classList.toggle('active', tab === 'india');
+      els.tabIndia.setAttribute('aria-selected', tab === 'india');
+    }
+    if (els.tabGlobal) {
+      els.tabGlobal.classList.toggle('active', tab === 'global');
+      els.tabGlobal.setAttribute('aria-selected', tab === 'global');
+    }
+    if (els.tabSaved) {
+      els.tabSaved.classList.toggle('active', tab === 'saved');
+      els.tabSaved.setAttribute('aria-selected', tab === 'saved');
+    }
+    if (els.tabApplied) {
+      els.tabApplied.classList.toggle('active', tab === 'applied');
+      els.tabApplied.setAttribute('aria-selected', tab === 'applied');
+    }
 
     renderJobList();
   }
