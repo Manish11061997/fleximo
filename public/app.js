@@ -94,6 +94,14 @@
     topSearchClearBtn: $('#top-search-clear-btn'),
     topSearchSubmitBtn: $('#top-search-submit-btn'),
     topSwitchResumeBtn: $('#top-switch-resume-btn'),
+    mobileFloatingFilterFab: $('#mobile-floating-filter-fab'),
+    mobileFabFilterBadge: $('#mobile-fab-filter-badge'),
+    bottomNavHome: $('#bottom-nav-home'),
+    bottomNavSaved: $('#bottom-nav-saved'),
+    bottomNavApplied: $('#bottom-nav-applied'),
+    bottomNavAlerts: $('#bottom-nav-alerts'),
+    bottomNavSavedBadge: $('#bottom-nav-saved-badge'),
+    bottomNavAppliedBadge: $('#bottom-nav-applied-badge'),
     logo: $('.logo'),
 
     // Header
@@ -1074,6 +1082,14 @@
     if (els.tabSavedCount) {
       els.tabSavedCount.textContent = state.savedJobs.length;
     }
+    if (els.bottomNavSavedBadge) {
+      if (state.savedJobs.length > 0) {
+        els.bottomNavSavedBadge.textContent = state.savedJobs.length;
+        els.bottomNavSavedBadge.style.display = 'block';
+      } else {
+        els.bottomNavSavedBadge.style.display = 'none';
+      }
+    }
   }
 
   function bindJobCardClickEvents(targetList) {
@@ -1176,6 +1192,14 @@
   function renderJobList() {
     if (els.tabAppliedCount) {
       els.tabAppliedCount.textContent = state.appliedJobs.length;
+    }
+    if (els.bottomNavAppliedBadge) {
+      if (state.appliedJobs.length > 0) {
+        els.bottomNavAppliedBadge.textContent = state.appliedJobs.length;
+        els.bottomNavAppliedBadge.style.display = 'block';
+      } else {
+        els.bottomNavAppliedBadge.style.display = 'none';
+      }
     }
     if (els.tabSavedCount) {
       els.tabSavedCount.textContent = state.savedJobs.length;
@@ -1957,6 +1981,24 @@
     if (els.tabGlobal) els.tabGlobal.addEventListener('click', () => switchTab('global'));
     if (els.tabSaved) els.tabSaved.addEventListener('click', () => switchTab('saved'));
     if (els.tabApplied) els.tabApplied.addEventListener('click', () => switchTab('applied'));
+
+    // Mobile Bottom Navigation Dock Items
+    if (els.bottomNavHome) els.bottomNavHome.addEventListener('click', () => {
+      switchTab('worldwide');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+    if (els.bottomNavSaved) els.bottomNavSaved.addEventListener('click', () => {
+      switchTab('saved');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+    if (els.bottomNavApplied) els.bottomNavApplied.addEventListener('click', () => {
+      switchTab('applied');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+    if (els.bottomNavAlerts) els.bottomNavAlerts.addEventListener('click', () => {
+      const openAlertBtn = document.getElementById('open-alert-modal-btn');
+      if (openAlertBtn) openAlertBtn.click();
+    });
   }
 
   function switchTab(tab) {
@@ -1984,6 +2026,11 @@
       els.tabApplied.setAttribute('aria-selected', tab === 'applied');
     }
 
+    // Sync Mobile Bottom Nav Dock active states
+    if (els.bottomNavHome) els.bottomNavHome.classList.toggle('active', tab === 'worldwide' || tab === 'india' || tab === 'global');
+    if (els.bottomNavSaved) els.bottomNavSaved.classList.toggle('active', tab === 'saved');
+    if (els.bottomNavApplied) els.bottomNavApplied.classList.toggle('active', tab === 'applied');
+
     renderJobList();
   }
 
@@ -2003,6 +2050,14 @@
           els.activeFilterBadge.style.display = 'inline-block';
         } else {
           els.activeFilterBadge.style.display = 'none';
+        }
+      }
+      if (els.mobileFabFilterBadge) {
+        if (count > 0) {
+          els.mobileFabFilterBadge.textContent = count;
+          els.mobileFabFilterBadge.style.display = 'inline-block';
+        } else {
+          els.mobileFabFilterBadge.style.display = 'none';
         }
       }
       if (els.resetFiltersBtn) {
@@ -2045,16 +2100,21 @@
     bindDesktopFilterChange(els.countryScopeSelect, 'countryScope');
     bindDesktopFilterChange(els.dateRangeSelect, 'dateRange', true, true);
 
-    // Open Mobile Filter Modal
+    const openFilterModal = () => {
+      if (els.modalSortSelect) els.modalSortSelect.value = state.sortBy || 'match';
+      if (els.modalMinMatchSelect) els.modalMinMatchSelect.value = String(state.minMatch || 0);
+      if (els.modalRemoteTypeSelect) els.modalRemoteTypeSelect.value = state.remoteType || 'all';
+      if (els.modalCountryScopeSelect) els.modalCountryScopeSelect.value = state.countryScope || 'all';
+      if (els.modalDateRangeSelect) els.modalDateRangeSelect.value = String(state.dateRange || 30);
+      if (els.filtersModalOverlay) els.filtersModalOverlay.style.display = 'flex';
+    };
+
+    // Open Mobile Filter Modal from FAB or Toolbar
     if (els.openFiltersModalBtn) {
-      els.openFiltersModalBtn.addEventListener('click', () => {
-        if (els.modalSortSelect) els.modalSortSelect.value = state.sortBy || 'match';
-        if (els.modalMinMatchSelect) els.modalMinMatchSelect.value = String(state.minMatch || 0);
-        if (els.modalRemoteTypeSelect) els.modalRemoteTypeSelect.value = state.remoteType || 'all';
-        if (els.modalCountryScopeSelect) els.modalCountryScopeSelect.value = state.countryScope || 'all';
-        if (els.modalDateRangeSelect) els.modalDateRangeSelect.value = String(state.dateRange || 30);
-        if (els.filtersModalOverlay) els.filtersModalOverlay.style.display = 'flex';
-      });
+      els.openFiltersModalBtn.addEventListener('click', openFilterModal);
+    }
+    if (els.mobileFloatingFilterFab) {
+      els.mobileFloatingFilterFab.addEventListener('click', openFilterModal);
     }
 
     // Close & Cancel buttons

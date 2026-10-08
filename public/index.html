@@ -237,34 +237,36 @@
             </form>
           </div>
 
-          <!-- Tabs -->
-          <div class="tabs" id="tabs" role="tablist" aria-label="Job categories">
-            <button class="tab active" id="tab-worldwide" data-tab="worldwide" role="tab" aria-selected="true">
-              <span class="material-symbols-rounded tab-icon">public</span>
-              <span class="tab-text">Worldwide</span>
-              <span class="tab-count" id="tab-worldwide-count">0</span>
-            </button>
-            <button class="tab" id="tab-india" data-tab="india" role="tab" aria-selected="false">
-              <span class="material-symbols-rounded tab-icon">location_on</span>
-              <span class="tab-text">India</span>
-              <span class="tab-count" id="tab-india-count">0</span>
-            </button>
-            <button class="tab" id="tab-global" data-tab="global" role="tab" aria-selected="false">
-              <span class="material-symbols-rounded tab-icon">language</span>
-              <span class="tab-text">All Remote</span>
-              <span class="tab-count" id="tab-global-count">0</span>
-            </button>
-            <button class="tab" id="tab-saved" data-tab="saved" role="tab" aria-selected="false">
-              <span class="material-symbols-rounded tab-icon">bookmark</span>
-              <span class="tab-text">Saved</span>
-              <span class="tab-count" id="tab-saved-count">0</span>
-            </button>
-            <button class="tab" id="tab-applied" data-tab="applied" role="tab" aria-selected="false">
-              <span class="material-symbols-rounded tab-icon">task_alt</span>
-              <span class="tab-text">Applied</span>
-              <span class="tab-count" id="tab-applied-count">0</span>
-            </button>
-            <div class="tab-indicator" id="tab-indicator"></div>
+          <!-- Tabs with scroll edge fades -->
+          <div class="tabs-scroll-wrapper" id="tabs-scroll-wrapper">
+            <div class="tabs" id="tabs" role="tablist" aria-label="Job categories">
+              <button class="tab active" id="tab-worldwide" data-tab="worldwide" role="tab" aria-selected="true">
+                <span class="material-symbols-rounded tab-icon">public</span>
+                <span class="tab-text">Worldwide</span>
+                <span class="tab-count" id="tab-worldwide-count">0</span>
+              </button>
+              <button class="tab" id="tab-india" data-tab="india" role="tab" aria-selected="false">
+                <span class="material-symbols-rounded tab-icon">location_on</span>
+                <span class="tab-text">India</span>
+                <span class="tab-count" id="tab-india-count">0</span>
+              </button>
+              <button class="tab" id="tab-global" data-tab="global" role="tab" aria-selected="false">
+                <span class="material-symbols-rounded tab-icon">language</span>
+                <span class="tab-text">All Remote</span>
+                <span class="tab-count" id="tab-global-count">0</span>
+              </button>
+              <button class="tab" id="tab-saved" data-tab="saved" role="tab" aria-selected="false">
+                <span class="material-symbols-rounded tab-icon">bookmark</span>
+                <span class="tab-text">Saved</span>
+                <span class="tab-count" id="tab-saved-count">0</span>
+              </button>
+              <button class="tab" id="tab-applied" data-tab="applied" role="tab" aria-selected="false">
+                <span class="material-symbols-rounded tab-icon">task_alt</span>
+                <span class="tab-text">Applied</span>
+                <span class="tab-count" id="tab-applied-count">0</span>
+              </button>
+              <div class="tab-indicator" id="tab-indicator"></div>
+            </div>
           </div>
 
           <!-- Filter Bar (Adaptive: Inline Toolbar on Desktop, Modal on Mobile) -->
@@ -413,7 +415,36 @@
             <p class="empty-subtitle">Try adjusting your filters or upload a different resume</p>
           </div>
         </div>
+
+        <!-- Mobile Floating Sticky Filter FAB -->
+        <button type="button" class="mobile-floating-filter-fab" id="mobile-floating-filter-fab" aria-label="Open Filters">
+          <span class="material-symbols-rounded">tune</span>
+          <span class="fab-text">Filters</span>
+          <span class="fab-badge" id="mobile-fab-filter-badge" style="display:none;">0</span>
+        </button>
       </section>
+
+      <!-- ═══ Mobile Bottom Navigation Bar (App-like Dock) ═══ -->
+      <nav class="mobile-bottom-nav" id="mobile-bottom-nav" aria-label="Bottom navigation">
+        <button type="button" class="bottom-nav-item active" data-tab-target="worldwide" id="bottom-nav-home">
+          <span class="material-symbols-rounded">home</span>
+          <span class="bottom-nav-label">Feed</span>
+        </button>
+        <button type="button" class="bottom-nav-item" data-tab-target="saved" id="bottom-nav-saved">
+          <span class="material-symbols-rounded">bookmark</span>
+          <span class="bottom-nav-label">Saved</span>
+          <span class="bottom-nav-badge" id="bottom-nav-saved-badge" style="display:none;">0</span>
+        </button>
+        <button type="button" class="bottom-nav-item" data-tab-target="applied" id="bottom-nav-applied">
+          <span class="material-symbols-rounded">task_alt</span>
+          <span class="bottom-nav-label">Applied</span>
+          <span class="bottom-nav-badge" id="bottom-nav-applied-badge" style="display:none;">0</span>
+        </button>
+        <button type="button" class="bottom-nav-item" id="bottom-nav-alerts">
+          <span class="material-symbols-rounded">notifications</span>
+          <span class="bottom-nav-label">Alerts</span>
+        </button>
+      </nav>
 
       <!-- ═══ Error Section ═══ -->
       <section class="section error-section" id="error-section" style="display:none;">
